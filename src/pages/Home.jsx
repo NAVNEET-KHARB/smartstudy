@@ -2,12 +2,14 @@ import React from "react";
 import Container from "../components/container/Container";
 import Boy from "./boy.png";
 import { Link } from "react-router-dom";
+import Slider from "../components/slider/Slider";
 
 function Home() {
   return (
     <div className="w-full py-8">
       <Container>
         <div className="container mx-auto mt-10 px-4">
+          <Slider/>
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-900">
               Browse Our Top Courses
