@@ -9,14 +9,16 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 export default function PostForm({ post }) {
-  const { register, handleSubmit, watch, setValue, control, getValues, reset } = useForm({
-    defaultValues: {
-      title: "",
-      slug: "",
-      content: "",
-      status: "active",
-    },
-  });
+  const { register, handleSubmit, watch, setValue, control, getValues, reset } =
+    useForm({
+      defaultValues: {
+        title: "",
+        slug: "",
+        category: "",
+        content: "",
+        status: "active",
+      },
+    });
 
   const navigate = useNavigate();
   const userData = useSelector((state) => state.auth.userData);
@@ -27,6 +29,7 @@ export default function PostForm({ post }) {
       reset({
         title: post?.title || "",
         slug: post?.slug || "",
+        category: post?.category || "",
         content: post?.content || "",
         status: post?.status || "active",
       });
@@ -35,7 +38,9 @@ export default function PostForm({ post }) {
 
   const submit = async (data) => {
     if (post) {
-      const file = data.image[0] ? await appwriteService.uploadFile(data.image[0]) : null;
+      const file = data.image[0]
+        ? await appwriteService.uploadFile(data.image[0])
+        : null;
 
       if (file) {
         appwriteService.deleteFile(post.featuredImage);
@@ -55,7 +60,10 @@ export default function PostForm({ post }) {
       if (file) {
         const fileId = file.$id;
         data.featuredImage = fileId;
-        const dbPost = await appwriteService.createPost({ ...data, userId: userData.$id });
+        const dbPost = await appwriteService.createPost({
+          ...data,
+          userId: userData.$id,
+        });
 
         if (dbPost) {
           navigate(`/post/${dbPost.$id}`);
@@ -89,7 +97,10 @@ export default function PostForm({ post }) {
   }, [watch, slugTransform, setValue]);
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="flex flex-wrap md:flex-nowrap gap-6">
+    <form
+      onSubmit={handleSubmit(submit)}
+      className="flex flex-wrap md:flex-nowrap gap-6"
+    >
       {/* Left Column for Title, Slug, and Content */}
       <div className="w-full md:w-2/3 space-y-6">
         <Input
@@ -106,6 +117,16 @@ export default function PostForm({ post }) {
           onInput={(e) => {
             const transformedSlug = slugTransform(e.currentTarget.value);
             setValue("slug", transformedSlug, { shouldValidate: true });
+          }}
+        />
+        <Input
+          label="Category :"
+          placeholder="Category"
+          className="mb-4"
+          {...register("category", { required: true })}
+          onInput={(e) => {
+            const uppercaseValue = e.currentTarget.value.toUpperCase();
+            setValue("category", uppercaseValue, { shouldValidate: true });
           }}
         />
         <RTE
@@ -140,7 +161,11 @@ export default function PostForm({ post }) {
           className="mb-4"
           {...register("status", { required: true })}
         />
-        <Button type="submit" bgColor={post ? "bg-green-500" : "bg-blue-500"} className="w-full">
+        <Button
+          type="submit"
+          bgColor={post ? "bg-green-500" : "bg-blue-500"}
+          className="w-full"
+        >
           {post ? "Update" : "Submit"}
         </Button>
       </div>
