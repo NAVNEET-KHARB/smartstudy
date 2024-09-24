@@ -7,6 +7,7 @@ function AllPosts() {
   const [posts, setPosts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedRating, setSelectedRating] = useState("highestToLowest"); // Default rating filter
 
   useEffect(() => {
     // Fetch all posts from the Appwrite service
@@ -27,16 +28,40 @@ function AllPosts() {
     setSelectedCategory(category);
   };
 
+  // Function to filter and sort posts based on rating
+  const filterPostsByRating = (rating) => {
+    setSelectedRating(rating);
+  };
+
   // Filtered posts based on the selected category
   const filteredPosts = selectedCategory === "All"
     ? posts
     : posts.filter((post) => post.category === selectedCategory);
+
+  // Sort filtered posts based on selected rating
+  const sortedPosts = filteredPosts.sort((a, b) => {
+    if (selectedRating === "highestToLowest") {
+      return b.totalRating - a.totalRating; // Sort descending
+    } else {
+      return a.totalRating - b.totalRating; // Sort ascending
+    }
+  });
 
   return (
     <div className="w-full py-8">
       <Container>
         {/* Filter Section */}
         <div className="mb-6 flex justify-end items-center">
+          <span className="mr-2 font-medium">Filter By Rating:</span>
+          <select
+            value={selectedRating}
+            onChange={(e) => filterPostsByRating(e.target.value)}
+            className="p-2 border rounded-md mr-4"
+          >
+            <option value="highestToLowest">Highest to Lowest</option>
+            <option value="lowestToHighest">Lowest to Highest</option>
+          </select>
+
           <span className="mr-2 font-medium">Filter By Category:</span>
           <select
             value={selectedCategory}
@@ -53,8 +78,8 @@ function AllPosts() {
 
         {/* Display filtered posts */}
         <div className="flex flex-wrap">
-          {filteredPosts.length > 0 ? (
-            filteredPosts.map((post) => (
+          {sortedPosts.length > 0 ? (
+            sortedPosts.map((post) => (
               <div className="p-2 w-1/4" key={post.$id}>
                 <PostCard {...post} />
               </div>
