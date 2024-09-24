@@ -1,35 +1,33 @@
-import React from 'react'
-import { useState } from 'react'
-import {useParams, useNavigate} from "react-router-dom"
-import appwriteService from "../appwrite/config"
-import { useEffect } from 'react'
-import Container from "../components/container/Container"
-import PostForm from "../components/post-form/PostForm"
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from "react-router-dom";
+import appwriteService from "../appwrite/config";
+import Container from "../components/container/Container";
+import PostForm from "../components/post-form/PostForm";
 
 function EditPost() {
-  const [post, setPost] = useState(null)
-  const {slug} = useParams()
-  const navigate = useNavigate()
+    const [post, setPost] = useState(null);
+    const { postId } = useParams(); // Changed to postId
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    if (slug) {
-      appwriteService.getPost(slug).then((post) => {
-        if (post) {
-          setPost(post)
-        }else {
-          navigate("/")
+    useEffect(() => {
+        if (postId) { // Changed to postId
+            appwriteService.getPost(postId).then((post) => {
+                if (post) {
+                    setPost(post);
+                } else {
+                    navigate("/");
+                }
+            });
         }
-      })
-    }
-  }, [slug, navigate])
+    }, [postId, navigate]); // Changed to postId
 
-  return (
-    <div className='py-6'>
-      <Container>
-        <PostForm post={post} />
-      </Container>
-    </div>
-  )
+    return (
+        <div className='py-6'>
+            <Container>
+                <PostForm post={post} />
+            </Container>
+        </div>
+    );
 }
 
-export default EditPost
+export default EditPost;

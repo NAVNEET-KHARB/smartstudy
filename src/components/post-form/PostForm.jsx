@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Button from "../Button";
 import Input from "../Input";
@@ -13,7 +13,6 @@ export default function PostForm({ post }) {
     useForm({
       defaultValues: {
         title: "",
-        slug: "",
         category: "",
         content: "",
         status: "active",
@@ -28,7 +27,6 @@ export default function PostForm({ post }) {
     if (post) {
       reset({
         title: post?.title || "",
-        slug: post?.slug || "",
         category: post?.category || "",
         content: post?.content || "",
         status: post?.status || "active",
@@ -72,30 +70,6 @@ export default function PostForm({ post }) {
     }
   };
 
-  const slugTransform = useCallback((value) => {
-    if (value && typeof value === "string") {
-      const transformedSlug = value
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-zA-Z\d\s]+/g, "-")
-        .replace(/\s/g, "-");
-      return transformedSlug;
-    }
-    return "";
-  }, []);
-
-  // Watch for title changes to auto-generate slug
-  useEffect(() => {
-    const subscription = watch((value, { name }) => {
-      if (name === "title") {
-        const transformedSlug = slugTransform(value.title);
-        setValue("slug", transformedSlug, { shouldValidate: true });
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [watch, slugTransform, setValue]);
-
   return (
     <form
       onSubmit={handleSubmit(submit)}
@@ -108,16 +82,6 @@ export default function PostForm({ post }) {
           placeholder="Title"
           className="mb-4"
           {...register("title", { required: true })}
-        />
-        <Input
-          label="Slug :"
-          placeholder="Slug"
-          className="mb-4"
-          {...register("slug", { required: true })}
-          onInput={(e) => {
-            const transformedSlug = slugTransform(e.currentTarget.value);
-            setValue("slug", transformedSlug, { shouldValidate: true });
-          }}
         />
         <Input
           label="Category :"

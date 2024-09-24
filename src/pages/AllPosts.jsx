@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import appwriteService from "../appwrite/config";
 import Container from '../components/container/Container';
 import PostCard from "../components/PostCard";
@@ -10,9 +10,9 @@ function AllPosts() {
 
   useEffect(() => {
     // Fetch all posts from the Appwrite service
-    appwriteService.getPosts([]).then((posts) => {
-      if (posts) {
-        const allPosts = posts.documents;
+    appwriteService.getPosts([]).then((response) => {
+      if (response && response.documents) {
+        const allPosts = response.documents;
         setPosts(allPosts);
 
         // Extract unique categories from the posts
