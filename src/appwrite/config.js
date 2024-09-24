@@ -42,7 +42,7 @@ export class Service {
     }
   }
 
-  // Create a new post with rating fields
+  // Create a new post with sections
   async createPost({
     title,
     content,
@@ -50,6 +50,7 @@ export class Service {
     status,
     userId,
     category,
+    sections, // Add sections to parameters
   }) {
     try {
       const postId = ID.unique(); // Generate a unique postId
@@ -67,6 +68,7 @@ export class Service {
           postId, // Store postId in the document
           totalRating: 0, // Initial total rating
           numberOfRatings: 0, // Initial number of ratings
+          sections, // Store sections in the document
         }
       );
     } catch (error) {
@@ -100,19 +102,27 @@ export class Service {
   }
 
   // Update post details
-  async updatePost(postId, data) {
+  async updatePost(postId, { title, content, featuredImage, status, category, sections }) {
     try {
       return await this.databases.updateDocument(
         conf.appwriteDatabaseId,
         conf.appwriteCollectionId,
-        postId,
-        data
+        postId, // Use postId as the document ID
+        {
+          title,
+          content,
+          featuredImage,
+          status,
+          category,
+          sections // Add sections to the document
+        }
       );
     } catch (error) {
       console.log("Appwrite service :: updatePost() :: ", error);
       return false;
     }
   }
+  
 
   // Delete a post
   async deletePost(postId) {
