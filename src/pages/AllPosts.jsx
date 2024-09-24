@@ -7,85 +7,81 @@ function AllPosts() {
   const [posts, setPosts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedRating, setSelectedRating] = useState("highestToLowest"); // Default rating filter
+  const [selectedRating, setSelectedRating] = useState("highestToLowest");
 
   useEffect(() => {
-    // Fetch all posts from the Appwrite service
     appwriteService.getPosts([]).then((response) => {
       if (response && response.documents) {
         const allPosts = response.documents;
         setPosts(allPosts);
-
-        // Extract unique categories from the posts
         const uniqueCategories = ["All", ...new Set(allPosts.map((post) => post.category))];
         setCategories(uniqueCategories);
       }
     });
   }, []);
 
-  // Function to filter posts by selected category
   const filterPostsByCategory = (category) => {
     setSelectedCategory(category);
   };
 
-  // Function to filter and sort posts based on rating
   const filterPostsByRating = (rating) => {
     setSelectedRating(rating);
   };
 
-  // Filtered posts based on the selected category
   const filteredPosts = selectedCategory === "All"
     ? posts
     : posts.filter((post) => post.category === selectedCategory);
 
-  // Sort filtered posts based on selected rating
   const sortedPosts = filteredPosts.sort((a, b) => {
     if (selectedRating === "highestToLowest") {
-      return b.totalRating - a.totalRating; // Sort descending
+      return b.totalRating - a.totalRating;
     } else {
-      return a.totalRating - b.totalRating; // Sort ascending
+      return a.totalRating - b.totalRating;
     }
   });
 
   return (
-    <div className="w-full py-8">
+    <div className="w-full py-12 bg-gray-50">
       <Container>
         {/* Filter Section */}
-        <div className="mb-6 flex justify-end items-center">
-          <span className="mr-2 font-medium">Filter By Rating:</span>
-          <select
-            value={selectedRating}
-            onChange={(e) => filterPostsByRating(e.target.value)}
-            className="p-2 border rounded-md mr-4"
-          >
-            <option value="highestToLowest">Highest to Lowest</option>
-            <option value="lowestToHighest">Lowest to Highest</option>
-          </select>
-
-          <span className="mr-2 font-medium">Filter By Category:</span>
-          <select
-            value={selectedCategory}
-            onChange={(e) => filterPostsByCategory(e.target.value)}
-            className="p-2 border rounded-md"
-          >
-            {categories.map((category, index) => (
-              <option key={index} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
+        <div className="mb-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <div className="flex items-center">
+            <span className="text-gray-700 mr-3 font-medium">Category:</span>
+            <select
+              value={selectedCategory}
+              onChange={(e) => filterPostsByCategory(e.target.value)}
+              className="p-3 border border-gray-300 rounded-md bg-white text-gray-700 focus:ring focus:ring-blue-300"
+            >
+              {categories.map((category, index) => (
+                <option key={index} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center">
+            <span className="text-gray-700 mr-3 font-medium">Rating:</span>
+            <select
+              value={selectedRating}
+              onChange={(e) => filterPostsByRating(e.target.value)}
+              className="p-3 border border-gray-300 rounded-md bg-white text-gray-700 focus:ring focus:ring-blue-300"
+            >
+              <option value="highestToLowest">Highest to Lowest</option>
+              <option value="lowestToHighest">Lowest to Highest</option>
+            </select>
+          </div>
         </div>
 
         {/* Display filtered posts */}
-        <div className="flex flex-wrap">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {sortedPosts.length > 0 ? (
             sortedPosts.map((post) => (
-              <div className="p-2 w-1/4" key={post.$id}>
+              <div className="transform transition duration-500 hover:scale-105" key={post.$id}>
                 <PostCard {...post} />
               </div>
             ))
           ) : (
-            <p>No posts available in this category.</p>
+            <p className="text-center text-gray-500">No posts available in this category.</p>
           )}
         </div>
       </Container>
